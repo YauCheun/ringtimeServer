@@ -4,7 +4,10 @@ const port = 3000
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
-require('./router/index')(app)
+require('./routes/index')(app)
+
+// apidoc存放的位置
+app.use('/public',express.static('public'))
 
 app.get('/', (req, res) => {
 	res.send('Hello World!')

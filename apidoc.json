@@ -1,0 +1,8 @@
+{
+  "name": "ringtime-server",
+  "version": "1.0.0",
+  "description": "ringtime项目接口文档",
+  "title": "接口文档",
+  "url" : "http://localhost:3000",
+  "sampleUrl": "http://localhost:3001"
+}
