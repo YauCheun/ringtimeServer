@@ -2,6 +2,7 @@ const findUser = require('../dao/dbserver')
 const { emailSignUp } = require('../dao/emailserver')
 const signup = require('../server/signup')
 const signin = require('../server/signin')
+const searchUser = require('../server/searchFriend')
 
 
 // console.log(findUser)
@@ -92,4 +93,32 @@ module.exports = function (app) {
 	app.post('/signin/login', (req, res) => {
 		signin.signIn(req, res)
 	})
+
+		/**
+	* @api {post}	/searchUser/search 搜索用户
+	* @apiDescription 通过关键词搜索用户好友
+	* @apiName search
+	* @apiGroup Search
+	* @apiParam {string} keyword 关键词
+	* @apiParam {string} uid  用户id
+	* @apiSuccess {string} status 状态码
+	* @apiSuccess {array} data 返回值
+	* @apiSuccess {boolean} success 执行成功或失败
+	* @apiSuccessExample {json} Success-Response:
+	*  {
+	*   "status" : "200",
+	*		"data": {
+	*    "id": "614b2f73ce3bef9d31a064bf",
+	*    "name": "zhangyou",
+	*    "imgurl": "user.png",
+	*    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxNGIyZjczY2UzYmVmOWQzMWEwNjRiZiIsImlhdCI6MTYzNDAzNjU2MCwiZXhwIjoxNjQ0NDA0NTYwfQ.fmwllXNVFjWOtVSTkMduAibx7DykT6kz_QgvJyqhY0w"
+	*  },
+	*   "success": true
+	*  }
+	* @apiSampleRequest http://localhost:3000/searchUser/search
+	* @apiVersion 1.0.0
+*/
+app.post('/searchUser/search', (req, res) => {
+	searchUser.searchUser(req, res)
+})
 }

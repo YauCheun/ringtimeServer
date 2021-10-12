@@ -1,6 +1,7 @@
 let dbmodel = require('../model/dbmodel')
 let bcrypt = require('./bcrypt')
 let User = dbmodel.model('User')
+let Friend = dbmodel.model('Friend')
 let jwt = require('./jwt')
 // console.log(User)
 // function findUser(res) {
@@ -30,7 +31,7 @@ exports.buildUser = function (name, mail, psw, res) {
     if (err) {
       res.send({ status: 500 })
     } else {
-      res.send({ status: 200,success: true })
+      res.send({ status: 200, success: true })
     }
   })
 }
@@ -43,7 +44,7 @@ exports.countUserValue = function (data, type, res) {
     if (err) {
       res.send({ status: 500 })
     } else {
-      res.send({ stauts: 200, result,success: true })
+      res.send({ stauts: 200, result, success: true })
     }
   })
 }
@@ -51,17 +52,17 @@ exports.countUserValue = function (data, type, res) {
 //用户登录验证
 exports.userMatch = function (data, psw, res) {
   let wherestr = { $or: [{ 'name': data }, { 'email': data }] }
-  let print = {'name': 1,'imgurl': 1,'psw': 1}
-  User.find(wherestr,print, function (err, result) {
+  let print = { 'name': 1, 'imgurl': 1, 'psw': 1 }
+  User.find(wherestr, print, function (err, result) {
     if (err) {
       res.send({ status: 500 })
     } else {
-      if(result==''){
-        res.send({stauts: 200,resultmsg: '无此账号信息',success: false})
-      }else{
-        result.map(e=>{
+      if (result == '') {
+        res.send({ stauts: 200, resultmsg: '无此账号信息', success: false })
+      } else {
+        result.map(e => {
           const pswMatch = bcrypt.verification(psw, e.psw)
-          if(pswMatch){
+          if (pswMatch) {
             let token = jwt.generateToken(e._id)
             let backData = {
               id: e._id,
@@ -69,14 +70,56 @@ exports.userMatch = function (data, psw, res) {
               imgurl: e.imgurl,
               token: token
             }
-            res.send({stauts: 200,data:backData,success: true})
-          }else{
-            res.send({stauts: 200, resultmsg: '用户名密码错误！',success: false})
+            res.send({ stauts: 200, data: backData, success: true })
+          } else {
+            res.send({ stauts: 200, resultmsg: '用户名密码错误！', success: false })
           }
         })
       }
-      
+
     }
   })
+}
+
+// 搜索好友并且判断是否为好友
+exports.searchUser = async function (keyword, uid, res) {
+  let wherestr = { $or: [{ 'name': { $regex: keyword } }, { 'email': { $regex: keyword } }] }
+  let print = {
+    'name': 1,
+    'email': 1,
+    'imgurl': 1
+  }
+  let result = await new Promise((resolve, reject) => {
+    User.find(wherestr, print, async function (err, result) {
+      if (err) {
+        res.send({ status: 500 })
+      } else {
+        resolve(result)
+      }
+    })
+  })
+  let str
+  let finalRes = []
+  let temp
+  result.forEach(async e => {
+    str = { 'userID': uid, 'friendID': e._id, 'state': 0 }
+    new Promise((resolve, reject) => {
+      Friend.findOne(str, function (err, result1) {
+        if (err) {
+          res.send({ status: 500 })
+        } else {
+          if(result1){
+            res.send({ stauts: 200, data: result1, success: true })
+            // resolve(result1.friendID)
+          }
+        }
+      })
+    })
+    finalRes.push(temp)
+  })
+  console.log(finalRes)
+
+  res.send({ stauts: 200, data: result, success: true })
+
 }
 // module.exports = findUser

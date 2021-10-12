@@ -1,6 +1,11 @@
 const nodemailer = require('nodemailer')
 // 引入证书文件
-let credentials = require('../config/credentials')
+let credentials = {
+  qq: {
+    user: '1272125039@qq.com',
+    pass: '111111111111111111'
+  }
+}
 
 // 创建传输方式
 let transporter = nodemailer.createTransport({
