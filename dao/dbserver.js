@@ -2,7 +2,10 @@ let dbmodel = require('../model/dbmodel')
 let bcrypt = require('./bcrypt')
 let User = dbmodel.model('User')
 let Friend = dbmodel.model('Friend')
+let Group = dbmodel.model('Group')
+let GroupUser = dbmodel.model('GroupUser')
 let jwt = require('./jwt')
+const async = require('async')
 // console.log(User)
 // function findUser(res) {
 //   User.find(function (err, val) {
@@ -65,7 +68,7 @@ exports.userMatch = function (data, psw, res) {
           if (pswMatch) {
             let token = jwt.generateToken(e._id)
             let backData = {
-              id: e._id,
+              _id: e._id,
               name: e.name,
               imgurl: e.imgurl,
               token: token
@@ -81,8 +84,9 @@ exports.userMatch = function (data, psw, res) {
   })
 }
 
-// 搜索好友并且判断是否为好友
+// 关键词搜索出用户或群，并判断是否为好友以及是否在群里
 exports.searchUser = async function (keyword, uid, res) {
+  // =========用户========
   let wherestr = { $or: [{ 'name': { $regex: keyword } }, { 'email': { $regex: keyword } }] }
   let print = {
     'name': 1,
@@ -98,28 +102,47 @@ exports.searchUser = async function (keyword, uid, res) {
       }
     })
   })
+  let friendIDs = []
   let str
-  let finalRes = []
-  let temp
-  result.forEach(async e => {
-    str = { 'userID': uid, 'friendID': e._id, 'state': 0 }
-    new Promise((resolve, reject) => {
-      Friend.findOne(str, function (err, result1) {
-        if (err) {
-          res.send({ status: 500 })
-        } else {
-          if(result1){
-            res.send({ stauts: 200, data: result1, success: true })
-            // resolve(result1.friendID)
-          }
-        }
-      })
-    })
-    finalRes.push(temp)
+  for (let i = 0; i < result.length; i++) {
+    str = { 'userID': uid, 'friendID': result[i]._id, 'state': 0 }
+    let temp = await Friend.findOne(str)
+    if (temp) friendIDs.push(temp.friendID.toString())
+  }
+  let finalRes = {
+    friends: [],
+    groups: []
+  }
+  result.forEach(e => {
+    finalRes.friends.push({ ...e._doc, isFriend: friendIDs.includes(e.id) })
   })
-  console.log(finalRes)
-
-  res.send({ stauts: 200, data: result, success: true })
+  // =====群==========
+  let wheregroupstr = { 'name': { $regex: keyword } }
+  let printgroup = {
+    'name': 1,
+    'imgurl': 1
+  }
+  let groupresult = await new Promise((resolve, reject) => {
+    Group.find(wheregroupstr, printgroup, async function (err, result) {
+      if (err) {
+        res.send({ status: 500 })
+      } else {
+        resolve(result)
+      }
+    })
+  })
+  let GroupIDs = []
+  let groupstr
+  for (let i = 0; i < groupresult.length; i++) {
+    groupstr = { 'userID': uid, 'groupID': groupresult[i]._id, 'state': 0 }
+    let tempgroup = await GroupUser.findOne(groupstr)
+    if (tempgroup) GroupIDs.push(tempgroup.groupID.toString())
+  }
+  groupresult.forEach(e => {
+    finalRes.groups.push({ ...e._doc, isGroup: GroupIDs.includes(e.id) })
+  })
+  res.send({ stauts: 200, data: finalRes, success: true })
 
 }
+
 // module.exports = findUser

@@ -94,31 +94,55 @@ module.exports = function (app) {
 		signin.signIn(req, res)
 	})
 
-		/**
-	* @api {post}	/searchUser/search 搜索用户
-	* @apiDescription 通过关键词搜索用户好友
-	* @apiName search
-	* @apiGroup Search
-	* @apiParam {string} keyword 关键词
-	* @apiParam {string} uid  用户id
-	* @apiSuccess {string} status 状态码
-	* @apiSuccess {array} data 返回值
-	* @apiSuccess {boolean} success 执行成功或失败
-	* @apiSuccessExample {json} Success-Response:
-	*  {
-	*   "status" : "200",
-	*		"data": {
-	*    "id": "614b2f73ce3bef9d31a064bf",
-	*    "name": "zhangyou",
-	*    "imgurl": "user.png",
-	*    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYxNGIyZjczY2UzYmVmOWQzMWEwNjRiZiIsImlhdCI6MTYzNDAzNjU2MCwiZXhwIjoxNjQ0NDA0NTYwfQ.fmwllXNVFjWOtVSTkMduAibx7DykT6kz_QgvJyqhY0w"
-	*  },
-	*   "success": true
-	*  }
-	* @apiSampleRequest http://localhost:3000/searchUser/search
-	* @apiVersion 1.0.0
+	/**
+* @api {post}	/searchUser/search 搜索用户或群
+* @apiDescription 通过关键词搜索用户或群,并判断是否为好友以及是否在群内
+* @apiName search
+* @apiGroup Search
+* @apiParam {string} keyword 关键词
+* @apiParam {string} uid  用户id
+* @apiSuccess {string} status 状态码
+* @apiSuccess {object} data 返回值
+* @apiSuccess {boolean} success 执行成功或失败
+* @apiSuccessExample {json} Success-Response:
+*  {
+*   "status" : "200",
+*		"data": {
+*        "friends": [
+*            {
+*                "_id": "61658f08cab2e6c5b2fbf6c3",
+*                "name": "test1",
+*                "imgurl": "user.png",
+*                "isFriend": false
+*            },
+*            {
+*                "_id": "6165903ecab2e6c5b2fbf6c5",
+*                "name": "test",
+*                "imgurl": "user.png",
+*                "isFriend": true
+*            }
+*        ],
+*        "groups": [
+*            {
+*                "imgurl": "group.png",
+*                "_id": "617aa274d0977faa7d2dd594",
+*                "name": "testGroup",
+*                "isGroup": false
+*            },
+*            {
+*                "imgurl": "group.png",
+*                "_id": "617aa33fd0977faa7d2dd595",
+*                "name": "testGrp",
+*                "isGroup": true
+*            }
+*        ]
+*    },
+*   "success": true
+*  }
+* @apiSampleRequest http://localhost:3000/searchUser/search
+* @apiVersion 1.0.0
 */
-app.post('/searchUser/search', (req, res) => {
-	searchUser.searchUser(req, res)
-})
+	app.post('/searchUser/search', (req, res) => {
+		searchUser.searchUser(req, res)
+	})
 }
