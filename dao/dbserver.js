@@ -145,4 +145,16 @@ exports.searchUser = async function (keyword, uid, res) {
 
 }
 
+// 获取用户详情
+exports.getUserInfo = function (id, res) {
+  let wherestr = {"_id":id}
+  let out = {'psw': 0}
+  User.findOne(wherestr,out, function (err, result) {
+    if (err) {
+      res.send({ status: 500 })
+    } else {
+      res.send({ stauts: 200, data: result, success: true })
+    }
+  })
+}
 // module.exports = findUser
