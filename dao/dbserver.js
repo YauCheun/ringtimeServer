@@ -147,9 +147,9 @@ exports.searchUser = async function (keyword, uid, res) {
 
 // 获取用户详情
 exports.getUserInfo = function (id, res) {
-  let wherestr = {"_id":id}
-  let out = {'psw': 0}
-  User.findOne(wherestr,out, function (err, result) {
+  let wherestr = { "_id": id }
+  let out = { 'psw': 0 }
+  User.findOne(wherestr, out, function (err, result) {
     if (err) {
       res.send({ status: 500 })
     } else {
@@ -158,3 +158,71 @@ exports.getUserInfo = function (id, res) {
   })
 }
 // module.exports = findUser
+
+exports.updateUserInfo = function (data, res) {
+  let updateStr = {}
+  // 存在密码项
+  console.log(data)
+  if (data.type === 'psw') {
+    User.find({ '_id': data.id }, function (err, result) {
+      if (err) {
+        res.send({ status: 500 })
+      } else {
+        console.log(result)
+        if (result == '') {
+          res.send({ status: 400 })
+        }
+        const pswMatch = bcrypt.verification(data.oldPsw, result[0].psw) //
+        if (pswMatch) {
+          // 验证成功
+          updateStr[data.type] = bcrypt.encryption(data.data)
+          User.findByIdAndUpdate(data.id, updateStr, function (err, resu) {
+            if (err) {
+              res.send({ status: 500 })
+            } else {
+              res.send({ status: 200 })
+            }
+          })
+        } else {
+          res.send({ status: 400 })
+        }
+      }
+    })
+  } else {
+    updateStr[data.type] = data.data
+    User.findByIdAndUpdate(data.id, updateStr, function (err, resu) {
+      if (err) {
+        res.send({ status: 500 })
+      } else {
+        res.send({ status: 200 })
+      }
+    })
+  }
+}
+
+// 修改好友昵称
+exports.makeFriendName = function (data, res) {
+  let whereStr = { 'userID': data.uid, 'friendID': data.fid }
+  let updateStr = { 'nickname': data.nickname }
+  Friend.updateOne(whereStr, updateStr, function (err, result) {
+    if (err) {
+      res.send({ status: 500 })
+    } else {
+      res.send({ status: 200 })
+    }
+  })
+}
+
+
+// 获取好友昵称
+exports.getFriendName = function (data, res) {
+  let whereStr = { 'userID': data.uid, 'friendID': data.fid }
+  let out = { 'nickname': 1 }
+  Friend.findOne(whereStr, out, function (err, result) {
+    if (err) {
+      res.send({ status: 500 })
+    } else {
+      res.send({ status: 200, data: result })
+    }
+  })
+}

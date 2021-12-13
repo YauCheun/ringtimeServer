@@ -3,6 +3,7 @@ const { emailSignUp } = require('../dao/emailserver')
 const signup = require('../server/signup')
 const signin = require('../server/signin')
 const searchUser = require('../server/searchFriend')
+const userDetail = require('../server/userDetail')
 
 
 // console.log(findUser)
@@ -145,4 +146,101 @@ module.exports = function (app) {
 	app.post('/searchUser/search', (req, res) => {
 		searchUser.searchUser(req, res)
 	})
+
+
+
+	/**
+* @api {post}	/user/getUserInfo 获取用户详情
+* @apiDescription 通过用户主键检索用户详情信息
+* @apiName getUserInfo
+* @apiGroup User
+* @apiParam {string} id  用户id
+* @apiSuccess {string} status 状态码
+* @apiSuccess {object} data 返回值
+* @apiSuccess {boolean} success 执行成功或失败
+* @apiSuccessExample {json} Success-Response:
+*  {
+*   "status" : "200",
+*		"data": {
+*		    "_id": "6165903ecab2e6c5b2fbf6c5",
+*		    "name": "test",
+*		    "sex": "unknown",
+*		    "imgurl": "user.png",
+*		    "createtime": "2021-10-12T13:40:14.846Z",
+*		    "__v": 0
+*		 },
+*   "success": true
+*  }
+* @apiSampleRequest http://localhost:3000/user/getUserInfo
+* @apiVersion 1.0.0
+*/
+	app.post('/user/getUserInfo', (req, res) => {
+		userDetail.getUserInfo(req, res)
+	})
+
+
+	/**
+* @api {post}	/user/updateUserInfo 修改用户信息
+* @apiDescription 修改用户信息包括邮箱密码等
+* @apiName updateUserInfo
+* @apiGroup User
+* @apiParam {string} id  用户id
+* @apiParam {string} type  修改类型
+* @apiParam {string} oldPsw  如果修改密码时的老密码
+* @apiParam {string} data  修改值
+* @apiSuccess {string} status 状态码  500请求失败  400 密码错误   200请求成功
+* @apiSuccess {object} data 返回值
+* @apiSuccess {boolean} success 执行成功或失败
+* @apiSuccessExample {json} Success-Response:
+*  {
+*   "status" : "200"
+*  }
+* @apiSampleRequest http://localhost:3000/user/updateUserInfo
+* @apiVersion 1.0.0
+*/
+	app.post('/user/updateUserInfo', (req, res) => {
+		userDetail.updateUserInfo(req, res)
+	})
+
+
+	/**
+* @api {post}	/user/makeFriendName 修改好友昵称
+* @apiDescription 修改用户好友备注
+* @apiName makeFriendName
+* @apiGroup User
+* @apiParam {string} uid  用户id
+* @apiParam {string} fid  好友用户id
+* @apiParam {string} nickname  要修改的好友名称
+* @apiSuccess {string} status 状态码
+* @apiSuccessExample {json} Success-Response:
+*  {
+*   "status" : "200"
+*  }
+* @apiSampleRequest http://localhost:3000/user/makeFriendName
+* @apiVersion 1.0.0
+*/
+	app.post('/user/makeFriendName', (req, res) => {
+		userDetail.makeFriendName(req, res)
+	})
+
+
+		/**
+* @api {post}	/user/getFriendName 获取好友昵称
+* @apiDescription 获取用户好友备注
+* @apiName getFriendName
+* @apiGroup User
+* @apiParam {string} uid  用户id
+* @apiParam {string} fid  好友用户id
+* @apiSuccess {string} status 状态码
+* @apiSuccessExample {json} Success-Response:
+*  {
+*   "status" : "200",
+*   "data": "nicename"
+*  }
+* @apiSampleRequest http://localhost:3000/user/getFriendName
+* @apiVersion 1.0.0
+*/
+app.post('/user/getFriendName', (req, res) => {
+	userDetail.getFriendName(req, res)
+})
 }
