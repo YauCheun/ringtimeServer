@@ -4,7 +4,7 @@ const signup = require('../server/signup')
 const signin = require('../server/signin')
 const searchUser = require('../server/searchFriend')
 const userDetail = require('../server/userDetail')
-
+const friend = require('../server/friend')
 
 // console.log(findUser)
 module.exports = function (app) {
@@ -188,7 +188,7 @@ module.exports = function (app) {
 * @apiParam {string} type  修改类型
 * @apiParam {string} oldPsw  如果修改密码时的老密码
 * @apiParam {string} data  修改值
-* @apiSuccess {string} status 状态码  500请求失败  400 密码错误   200请求成功
+* @apiSuccess {string} status 状态码  500请求失败  400 密码错误 300 已存在不可修改  200请求成功
 * @apiSuccess {object} data 返回值
 * @apiSuccess {boolean} success 执行成功或失败
 * @apiSuccessExample {json} Success-Response:
@@ -224,7 +224,7 @@ module.exports = function (app) {
 	})
 
 
-		/**
+	/**
 * @api {post}	/user/getFriendName 获取好友昵称
 * @apiDescription 获取用户好友备注
 * @apiName getFriendName
@@ -240,7 +240,27 @@ module.exports = function (app) {
 * @apiSampleRequest http://localhost:3000/user/getFriendName
 * @apiVersion 1.0.0
 */
-app.post('/user/getFriendName', (req, res) => {
-	userDetail.getFriendName(req, res)
+	app.post('/user/getFriendName', (req, res) => {
+		userDetail.getFriendName(req, res)
+	})
+
+		/**
+* @api {post}	/friend/applyFriend 申请好友
+* @apiDescription 发送好友申请
+* @apiName applyFriend
+* @apiGroup Friend
+* @apiParam {string} uid  用户id
+* @apiParam {string} fid  好友用户id
+* @apiParam {string} msg  申请描述内容
+* @apiSuccess {string} status 状态码
+* @apiSuccessExample {json} Success-Response:
+*  {
+*   "status" : "200",
+*  }
+* @apiSampleRequest http://localhost:3000/friend/applyFriend
+* @apiVersion 1.0.0
+*/
+app.post('/friend/applyFriend', (req, res) => {
+	friend.applyFriend(req, res)
 })
 }

@@ -23,7 +23,8 @@ let FriendSchema = new Schema({
   friendID: { type: Schema.Types.ObjectId, ref: 'User' },             // 好友ID
   state: { type: String },                                            // 状态（0：已为好友 1：申请中 2：申请发送方，对方还未同意）
   nickname: { type: String },                                         // 好友备注
-  createtime: { type: Date }                                          // 生成时间
+  createtime: { type: Date },                                        // 生成时间
+  lastMsgTime: { type: Date }                                          // 最后消息时间
 })
 
 // 一对一消息表
@@ -53,6 +54,7 @@ let GroupUserSchema = new Schema({
   tip: { type: Number },                                              // 未读消息数
   shield: { type: Number },                                           // 是否屏蔽群消息（0：不屏蔽 1：屏蔽）
   jointime: { type: Date },                                           // 加入时间
+  lastMsgTime: { type: Date }                                          // 最后消息时间
 })
 
 // 群消息表

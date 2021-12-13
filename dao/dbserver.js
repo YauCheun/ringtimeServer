@@ -2,6 +2,7 @@ let dbmodel = require('../model/dbmodel')
 let bcrypt = require('./bcrypt')
 let User = dbmodel.model('User')
 let Friend = dbmodel.model('Friend')
+let Message = dbmodel.model('Message')
 let Group = dbmodel.model('Group')
 let GroupUser = dbmodel.model('GroupUser')
 let jwt = require('./jwt')
@@ -188,16 +189,34 @@ exports.updateUserInfo = function (data, res) {
         }
       }
     })
-  } else {
+  } else if (data.type === 'name' || data.type === 'email') {
     updateStr[data.type] = data.data
-    User.findByIdAndUpdate(data.id, updateStr, function (err, resu) {
+    User.countDocuments(updateStr, function (err, result) {
       if (err) {
         res.send({ status: 500 })
       } else {
-        res.send({ status: 200 })
+        if (result === 0) {
+          update(data.id, updateStr, res)
+        } else {
+          // 已存在
+          res.send({ status: 300 })
+        }
       }
     })
+  } else {
+    updateStr[data.type] = data.data
+    update(data.id, updateStr, res)
   }
+}
+
+function update(id, str, res) {
+  User.findByIdAndUpdate(id, str, function (err, resu) {
+    if (err) {
+      res.send({ status: 500 })
+    } else {
+      res.send({ status: 200 })
+    }
+  })
 }
 
 // 修改好友昵称
@@ -223,6 +242,88 @@ exports.getFriendName = function (data, res) {
       res.send({ status: 500 })
     } else {
       res.send({ status: 200, data: result })
+    }
+  })
+}
+
+
+// 更新好友最后通讯时间
+exports.updateMsgLastTime = function (uid, fid) {
+  let wherestr = {
+    'userID': uid,
+    'friendID': fid,
+  }
+  let updatestr = { 'lastMsgTime': new Date() }
+  Friend.updateOne(wherestr, updatestr, function (err, result) {
+    if (err) {
+      console.log('更新通讯时间失败')
+    } else {
+      console.log('更新通讯时间成功')
+    }
+  })
+}
+
+// 好友操作，添加进好友表
+exports.buildFriend = function (uid, fid, state) {
+  let data = {
+    userID: uid,
+    friendID: fid,
+    state: state,
+    createtime: new Date(),
+    lastMsgTime: new Date()
+  }
+  let friend = new Friend(data)
+  friend.save(function (err, result) {
+    if (err) {
+      console.log('添加好友表失败')
+    } else {
+      console.log('添加好友表成功')
+    }
+  })
+}
+
+// 添加一对一消息
+exports.insertMsg = function (uid, fid, msg, types, res) {
+  let data = {
+    userID: uid,               // 用户ID
+    friendID: fid,             // 好友ID
+    message: msg,              // 内容
+    types: types,              // 内容类型（0：文字 1：图片连接 2：音频连接）
+    sendtime: new Date(),     // 发送时间
+    state: 1                 // 状态（0：已读 1：未读）
+  }
+  let message = new Message(data)
+  message.save(function (err, result) {
+    if (err) {
+      res.send({ status: 500 })
+    } else {
+      res.send({ status: 200 })
+    }
+  })
+}
+
+
+// 好友申请
+exports.applyFriend = function (data, res) {
+  // 判断是否已经申请过
+  let wherestr = {
+    'userID': data.uid,
+    'friendID': data.fid,
+  }
+  Friend.countDocuments(wherestr, (err, result) => {
+    if (err) {
+      res.send({ status: 500 })
+    } else {
+      if (result == 0) {
+        // 如果result为0， 则为初次申请
+        this.buildFriend(data.uid, data.fid, 2)
+        this.buildFriend(data.fid, data.uid, 1)
+      } else {
+        // 已经申请过好友，则更新通讯时间
+        this.updateMsgLastTime(data.uid, data.fid)
+        this.updateMsgLastTime(data.fid, data.uid)
+      }
+      this.insertMsg(data.uid, data.fid, data.msg, 0, res)
     }
   })
 }
