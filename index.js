@@ -5,7 +5,7 @@ const port = 3000
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 require('./routes/index')(app)
-
+require('./routes/files')(app)
 // apidoc存放的位置
 app.use('/public',express.static('public'))
 
