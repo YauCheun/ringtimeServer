@@ -5,3 +5,14 @@ exports.applyFriend = function (req, res) {
   let data = req.body
   dbserver.applyFriend(data, res)
 }
+
+// 同意好友申请
+exports.updateFriendState = function (req, res) {
+  let data = req.body
+  dbserver.updateFriendState(data, res)
+}
+// 拒绝或删除好友
+exports.forbidOrDelFriend  = function (req, res) {
+  let data = req.body
+  dbserver.forbidOrDelFriend(data, res)
+}

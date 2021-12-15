@@ -244,7 +244,7 @@ module.exports = function (app) {
 		userDetail.getFriendName(req, res)
 	})
 
-		/**
+	/**
 * @api {post}	/friend/applyFriend 申请好友
 * @apiDescription 发送好友申请
 * @apiName applyFriend
@@ -260,7 +260,46 @@ module.exports = function (app) {
 * @apiSampleRequest http://localhost:3000/friend/applyFriend
 * @apiVersion 1.0.0
 */
-app.post('/friend/applyFriend', (req, res) => {
-	friend.applyFriend(req, res)
+	app.post('/friend/applyFriend', (req, res) => {
+		friend.applyFriend(req, res)
+	})
+
+	/**
+* @api {post}	/friend/updateFriendState 同意好友申请
+* @apiDescription 同意好友申请
+* @apiName updateFriendState
+* @apiGroup Friend
+* @apiParam {string} uid  用户id
+* @apiParam {string} fid  好友用户id
+* @apiSuccess {string} status 状态码
+* @apiSuccessExample {json} Success-Response:
+*  {
+*   "status" : "200",
+*  }
+* @apiSampleRequest http://localhost:3000/friend/updateFriendState
+* @apiVersion 1.0.0
+*/
+	app.post('/friend/updateFriendState', (req, res) => {
+		friend.updateFriendState(req, res)
+	})
+
+	
+	/**
+* @api {post}	/friend/forbidOrDelFriend 拒绝或删除好友
+* @apiDescription 拒绝好友申请或者删除好友
+* @apiName forbidOrDelFriend
+* @apiGroup Friend
+* @apiParam {string} uid  用户id
+* @apiParam {string} fid  好友用户id
+* @apiSuccess {string} status 状态码
+* @apiSuccessExample {json} Success-Response:
+*  {
+*   "status" : "200",
+*  }
+* @apiSampleRequest http://localhost:3000/friend/forbidOrDelFriend
+* @apiVersion 1.0.0
+*/
+app.post('/friend/forbidOrDelFriend', (req, res) => {
+	friend.forbidOrDelFriend(req, res)
 })
 }

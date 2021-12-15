@@ -247,14 +247,20 @@ exports.getFriendName = function (data, res) {
 }
 
 
-// 更新好友最后通讯时间
-exports.updateMsgLastTime = function (uid, fid) {
+// 更新好友最后通讯时间，用户和好友都修改
+exports.updateMsgLastTime = function (data) {
   let wherestr = {
-    'userID': uid,
-    'friendID': fid,
+    $or: [{
+      'userID': data.uid,
+      'friendID': data.fid,
+    }, {
+      'userID': data.fid,
+      'friendID': data.uid,
+    }]
   }
+
   let updatestr = { 'lastMsgTime': new Date() }
-  Friend.updateOne(wherestr, updatestr, function (err, result) {
+  Friend.updateMany(wherestr, updatestr, function (err, result) {
     if (err) {
       console.log('更新通讯时间失败')
     } else {
@@ -320,10 +326,53 @@ exports.applyFriend = function (data, res) {
         this.buildFriend(data.fid, data.uid, 1)
       } else {
         // 已经申请过好友，则更新通讯时间
-        this.updateMsgLastTime(data.uid, data.fid)
-        this.updateMsgLastTime(data.fid, data.uid)
+        this.updateMsgLastTime(data)
       }
       this.insertMsg(data.uid, data.fid, data.msg, 0, res)
+    }
+  })
+}
+
+// 同意申请，更新好友状态，用户和好友都修改
+exports.updateFriendState = function (data, res) {
+  let wherestr = {
+    $or: [{
+      'userID': data.uid,
+      'friendID': data.fid,
+    }, {
+      'userID': data.fid,
+      'friendID': data.uid,
+    }]
+  }
+
+  let updatestr = { 'state': 0 }
+  Friend.updateMany(wherestr, updatestr, function (err, result) {
+    if (err) {
+      res.send({ status: 500 })
+    } else {
+      res.send({ status: 200 })
+    }
+  })
+}
+
+
+
+// 拒绝或删除好友
+exports.forbidOrDelFriend = function (data, res) {
+  let wherestr = {
+    $or: [{
+      'userID': data.uid,
+      'friendID': data.fid,
+    }, {
+      'userID': data.fid,
+      'friendID': data.uid,
+    }]
+  }
+  Friend.deleteMany(wherestr, function (err, result) {
+    if (err) {
+      res.send({ status: 500 })
+    } else {
+      res.send({ status: 200 })
     }
   })
 }
