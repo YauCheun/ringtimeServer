@@ -5,6 +5,7 @@ const signin = require('../server/signin')
 const searchUser = require('../server/searchFriend')
 const userDetail = require('../server/userDetail')
 const friend = require('../server/friend')
+const index = require('../server/index')
 
 // console.log(findUser)
 module.exports = function (app) {
@@ -283,7 +284,7 @@ module.exports = function (app) {
 		friend.updateFriendState(req, res)
 	})
 
-	
+
 	/**
 * @api {post}	/friend/forbidOrDelFriend 拒绝或删除好友
 * @apiDescription 拒绝好友申请或者删除好友
@@ -299,7 +300,26 @@ module.exports = function (app) {
 * @apiSampleRequest http://localhost:3000/friend/forbidOrDelFriend
 * @apiVersion 1.0.0
 */
-app.post('/friend/forbidOrDelFriend', (req, res) => {
-	friend.forbidOrDelFriend(req, res)
-})
+	app.post('/friend/forbidOrDelFriend', (req, res) => {
+		friend.forbidOrDelFriend(req, res)
+	})
+
+	/**
+* @api {post}	/index/getUserList 获取好友列表
+* @apiDescription 根据条件获取好友信息列表
+* @apiName getUserList
+* @apiGroup index
+* @apiParam {string} uid  用户id
+* @apiParam {number} state  好友状态
+* @apiSuccess {string} status 状态码
+* @apiSuccessExample {json} Success-Response:
+*  {
+*   "status" : "200",
+*  }
+* @apiSampleRequest http://localhost:3000/index/getUserList
+* @apiVersion 1.0.0
+*/
+	app.post('/index/getUserList', (req, res) => {
+		index.getUserList(req, res)
+	})
 }

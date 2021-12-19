@@ -376,3 +376,67 @@ exports.forbidOrDelFriend = function (data, res) {
     }
   })
 }
+
+
+// 获取好友列表
+exports.getUserList = function (data, res) {
+  let query = Friend.find({})
+  // 查询条件
+  query.where({ 'userID': data.uid, 'state': data.state })
+  // 查找friendID 关联的user对象
+  query.populate('friendID')
+  // 按照最后通讯时间倒序
+  query.sort({ 'lastMsgTime': -1 })
+  // 查询结果
+  query.exec().then(async e => {
+    let result = []
+    console.log(e)
+    for (let i = 0; i < e.length; i++) {
+      let oneMsg = await this.getLastOneMsg({ uid: data.uid, fid: e[i].friendID._id })
+      result.push({
+        id: e[i].friendID._id,
+        name: e[i].friendID.name,
+        nickname: e[i].nickname,
+        imgurl: e[i].friendID.imgurl,
+        lastMsgTime: e[i].lastMsgTime,
+        ...oneMsg
+      })
+    }
+    res.send({ status: 200, data: result })
+  }).catch(err => {
+    res.send({ status: 500, err })
+  })
+}
+
+// 获取最后一条一对一消息
+exports.getLastOneMsg = function (data, res) {
+  return new Promise((resolve, reject) => {
+    let query = Message.find({})
+    // 查询条件
+    query.where({
+      $or: [{
+        'userID': data.uid,
+        'friendID': data.fid,
+      }, {
+        'userID': data.fid,
+        'friendID': data.uid,
+      }]
+    })
+    // 按照最后通讯时间倒序
+    query.sort({ 'sendtime': -1 })
+    // 查询结果
+    query.exec().then(e => {
+      let result = e.map(i => {
+        return {
+          message: i.message,
+          sendtime: i.sendtime,
+          types: i.types
+        }
+      })
+      resolve(result[0])
+    }).catch(err => {
+      reject(err)
+    })
+  })
+
+} 

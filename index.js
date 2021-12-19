@@ -2,12 +2,14 @@ const express = require('express')
 const app = express()
 const port = 3000
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: false }))
+app.use(express.json({limit: '50mb'}))
+app.use(express.urlencoded({ limit: '50mb', extended: false }))
 require('./routes/index')(app)
 require('./routes/files')(app)
 // apidoc存放的位置
 app.use('/public',express.static('public'))
+// 上传文件存放的位置
+app.use('/public',express.static('upload'))
 
 app.get('/', (req, res) => {
 	res.send('Hello World!')
