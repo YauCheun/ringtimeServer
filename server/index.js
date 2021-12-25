@@ -5,3 +5,9 @@ exports.getUserList = function (req, res) {
   let data = req.body
   dbserver.getUserList(data, res)
 }
+
+// 获取群列表
+exports.getGroupList = function (req, res) {
+  let data = req.body
+  dbserver.getGroupList(data, res)
+}

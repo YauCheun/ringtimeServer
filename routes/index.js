@@ -308,18 +308,112 @@ module.exports = function (app) {
 * @api {post}	/index/getUserList 获取好友列表
 * @apiDescription 根据条件获取好友信息列表
 * @apiName getUserList
-* @apiGroup index
+* @apiGroup Index
 * @apiParam {string} uid  用户id
 * @apiParam {number} state  好友状态
 * @apiSuccess {string} status 状态码
 * @apiSuccessExample {json} Success-Response:
-*  {
-*   "status" : "200",
-*  }
+*{
+*    "status": 200,
+*    "data": [
+*        {
+*            "id": "61658f08cab2e6c5b2fbf6c3",
+*            "name": "哈巴",
+*            "imgurl": "user.png",
+*            "lastMsgTime": "2021-12-19T02:37:44.973Z",
+*            "msgUnReadCount": 1,
+*            "lastMsgContent": "test11",
+*            "sendtime": "2021-12-19T02:37:44.986Z",
+*            "types": "0"
+*        },
+*        {
+*            "id": "6165903ecab2e6c5b2fbf6c5",
+*            "name": "test",
+*            "nickname": "哈巴",
+*            "imgurl": "user.png",
+*            "lastMsgTime": "2021-12-19T02:30:39.896Z",
+*            "msgUnReadCount": 1,
+*            "lastMsgContent": "test",
+*            "sendtime": "2021-12-19T02:30:39.897Z",
+*            "types": "0"
+*        }
+*    ]
+*}
 * @apiSampleRequest http://localhost:3000/index/getUserList
 * @apiVersion 1.0.0
 */
 	app.post('/index/getUserList', (req, res) => {
 		index.getUserList(req, res)
 	})
+
+
+	/**
+* @api {post}	/friend/updateReadMsd 更新已读好友消息状态
+* @apiDescription 更新与好友的消息状态，将未读消息状态改为已读消息
+* @apiName updateReadMsd
+* @apiGroup Friend
+* @apiParam {string} uid  用户id
+* @apiParam {string} fid  好友id
+* @apiSuccess {string} status 状态码
+* @apiSuccessExample {json} Success-Response:
+*{
+*    "status": 200
+*}
+* @apiSampleRequest http://localhost:3000/friend/updateReadMsd
+* @apiVersion 1.0.0
+*/
+	app.post('/friend/updateReadMsd', (req, res) => {
+		friend.updateReadMsd(req, res)
+	})
+
+
+
+	/**
+* @api {post}	/index/getGroupList 获取群列表
+* @apiDescription 根据条件获取群信息列表
+* @apiName getGroupList
+* @apiGroup Index
+* @apiParam {string} uid  用户id
+* @apiSuccess {string} status 状态码
+* @apiSuccessExample {json} Success-Response:
+*{
+*    "status": 200,
+*    "data": [
+*        {
+*            "id": "61658f08cab2e6c5b2fbf6c3",
+*            "name": "哈巴",
+*            "imgurl": "user.png",
+*            "lastMsgTime": "2021-12-19T02:37:44.973Z",
+*            "msgUnReadCount": 1,
+*            "lastMsgContent": "test11",
+*            "sendtime": "2021-12-19T02:37:44.986Z",
+*            "types": "0"
+*        }
+*    ]
+*}
+* @apiSampleRequest http://localhost:3000/index/getGroupList
+* @apiVersion 1.0.0
+*/
+app.post('/index/getGroupList', (req, res) => {
+	index.getGroupList(req, res)
+})
+
+		/**
+* @api {post}	/group/updateGroupReadMsd 更新已读群消息状态
+* @apiDescription 更新群的消息状态，将未读消息状态改为已读消息
+* @apiName updateGroupReadMsd
+* @apiGroup Group
+* @apiParam {string} uid  用户id
+* @apiParam {string} gid  群id
+* @apiSuccess {string} status 状态码
+* @apiSuccessExample {json} Success-Response:
+*{
+*    "status": 200
+*}
+* @apiSampleRequest http://localhost:3000/group/updateGroupReadMsd
+* @apiVersion 1.0.0
+*/
+app.post('/group/updateGroupReadMsd', (req, res) => {
+	group.updateGroupReadMsd(req, res)
+})
 }

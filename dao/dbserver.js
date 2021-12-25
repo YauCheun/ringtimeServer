@@ -5,8 +5,9 @@ let Friend = dbmodel.model('Friend')
 let Message = dbmodel.model('Message')
 let Group = dbmodel.model('Group')
 let GroupUser = dbmodel.model('GroupUser')
+let GroupMessage = dbmodel.model('GroupMessage')
 let jwt = require('./jwt')
-const async = require('async')
+// const async = require('async')
 // console.log(User)
 // function findUser(res) {
 //   User.find(function (err, val) {
@@ -393,12 +394,14 @@ exports.getUserList = function (data, res) {
     console.log(e)
     for (let i = 0; i < e.length; i++) {
       let oneMsg = await this.getLastOneMsg({ uid: data.uid, fid: e[i].friendID._id })
+      let msgCount = await this.getUnReadCount({ uid: data.uid, fid: e[i].friendID._id })
       result.push({
         id: e[i].friendID._id,
         name: e[i].friendID.name,
         nickname: e[i].nickname,
         imgurl: e[i].friendID.imgurl,
         lastMsgTime: e[i].lastMsgTime,
+        msgUnReadCount: msgCount,
         ...oneMsg
       })
     }
@@ -408,7 +411,7 @@ exports.getUserList = function (data, res) {
   })
 }
 
-// 获取最后一条一对一消息
+// 获取与好友最后一条一对一消息
 exports.getLastOneMsg = function (data, res) {
   return new Promise((resolve, reject) => {
     let query = Message.find({})
@@ -428,7 +431,7 @@ exports.getLastOneMsg = function (data, res) {
     query.exec().then(e => {
       let result = e.map(i => {
         return {
-          message: i.message,
+          lastMsgContent: i.message,
           sendtime: i.sendtime,
           types: i.types
         }
@@ -438,5 +441,122 @@ exports.getLastOneMsg = function (data, res) {
       reject(err)
     })
   })
+}
 
-} 
+
+// 获取好友未读消息数量
+exports.getUnReadCount = function (data) {
+  return new Promise((resolve, reject) => {
+    // 判断是否已经申请过
+    let wherestr = {
+      'userID': data.uid,
+      'friendID': data.fid,
+      'state': 1
+    }
+    Message.countDocuments(wherestr, (err, result) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(result)
+      }
+    })
+  })
+}
+
+// 更新与好友的消息状态，将未读消息状态改为已读消息
+exports.updateReadMsd = function (data, res) {
+  // 判断是否已经申请过
+  let wherestr = {
+    'userID': data.uid,
+    'friendID': data.fid,
+    'state': 1
+  }
+  let updatestr = { 'state': 0 }
+  Message.updateMany(wherestr, updatestr, (err, result) => {
+    if (err) {
+      res.send({ status: 500 })
+    } else {
+      res.send({ status: 200 })
+    }
+  })
+}
+
+// 获取群列表
+exports.getGroupList = function (data, res) {
+  let query = GroupUser.find({})
+  // 查询条件
+  query.where({ 'userID': data.uid })
+  // 查找 groupID 关联的user对象
+  query.populate('groupID')
+  // 按照最后通讯时间倒序
+  query.sort({ 'lastMsgTime': -1 })
+  // 查询结果
+  query.exec().then(async e => {
+    let result = []
+    for (let i = 0; i < e.length; i++) {
+      let oneMsg = await this.getLastOneGroupMsg({ uid: data.uid, gid: e[i].groupID._id })
+      result.push({
+        id: e[i].groupID._id,
+        name: e[i].groupID.name,
+        // nickname: e[i].nickname,
+        imgurl: e[i].groupID.imgurl,
+        lastMsgTime: e[i].lastMsgTime,
+        msgUnReadCount: e[i].tip,
+        ...oneMsg
+      })
+    }
+    res.send({ status: 200, data: result })
+  }).catch(err => {
+    res.send({ status: 500, err })
+  })
+}
+
+// 获取群最后一条一对一消息
+exports.getLastOneGroupMsg = function (data, res) {
+  return new Promise((resolve, reject) => {
+    let query = GroupMessage.find({})
+    // 查询条件
+    query.where({
+      $or: [{
+        'userID': data.uid,
+        'groupID': data.gid,
+      }, {
+        'userID': data.fid,
+        'groupID': data.gid,
+      }]
+    })
+    // 按照最后通讯时间倒序
+    query.sort({ 'sendtime': -1 })
+    // 查询结果
+    query.exec().then(e => {
+      let result = e.map(i => {
+        return {
+          lastMsgContent: i.message,
+          sendtime: i.sendtime,
+          types: i.types
+        }
+      })
+      resolve(result[0])
+    }).catch(err => {
+      reject(err)
+    })
+  })
+}
+
+// 更新与好友的消息状态，将未读消息状态改为已读消息
+exports.updateGroupReadMsd = function (data, res) {
+  // 判断是否已经申请过
+  let wherestr = {
+    'userID': data.uid,
+    'friendID': data.gid,
+    'state': 1
+  }
+  let updatestr = { 'state': 0 }
+  GroupMessage.updateMany(wherestr, updatestr, (err, result) => {
+    if (err) {
+      res.send({ status: 500 })
+    } else {
+      res.send({ status: 200 })
+    }
+  })
+}
