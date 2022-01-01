@@ -49,7 +49,7 @@ exports.countUserValue = function (data, type, res) {
     if (err) {
       res.send({ status: 500 })
     } else {
-      res.send({ stauts: 200, result, success: true })
+      res.send({ status: 200, result, success: true })
     }
   })
 }
@@ -63,7 +63,7 @@ exports.userMatch = function (data, psw, res) {
       res.send({ status: 500 })
     } else {
       if (result == '') {
-        res.send({ stauts: 200, resultmsg: '无此账号信息', success: false })
+        res.send({ status: 200, resultmsg: '无此账号信息', success: false })
       } else {
         result.map(e => {
           const pswMatch = bcrypt.verification(psw, e.psw)
@@ -75,9 +75,9 @@ exports.userMatch = function (data, psw, res) {
               imgurl: e.imgurl,
               token: token
             }
-            res.send({ stauts: 200, data: backData, success: true })
+            res.send({ status: 200, data: backData, success: true })
           } else {
-            res.send({ stauts: 200, resultmsg: '用户名密码错误！', success: false })
+            res.send({ status: 200, resultmsg: '用户名密码错误！', success: false })
           }
         })
       }
@@ -143,7 +143,7 @@ exports.searchUser = async function (keyword, uid, res) {
   groupresult.forEach(e => {
     finalRes.groups.push({ ...e._doc, isGroup: GroupIDs.includes(e.id) })
   })
-  res.send({ stauts: 200, data: finalRes, success: true })
+  res.send({ status: 200, data: finalRes, success: true })
 
 }
 
@@ -155,7 +155,7 @@ exports.getUserInfo = function (id, res) {
     if (err) {
       res.send({ status: 500 })
     } else {
-      res.send({ stauts: 200, data: result, success: true })
+      res.send({ status: 200, data: result, success: true })
     }
   })
 }
