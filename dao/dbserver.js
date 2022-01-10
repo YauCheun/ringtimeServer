@@ -70,7 +70,7 @@ exports.userMatch = function (data, psw, res) {
           if (pswMatch) {
             let token = jwt.generateToken(e._id)
             let backData = {
-              _id: e._id,
+              id: e._id,
               name: e.name,
               imgurl: e.imgurl,
               token: token
