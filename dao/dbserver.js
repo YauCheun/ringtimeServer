@@ -560,3 +560,43 @@ exports.updateGroupReadMsd = function (data, res) {
     }
   })
 }
+// 分页获取与好友聊天信息
+exports.getMsg = function (data, res) {
+  // 分页起始值
+  let skipNum = data.page*data.pageSize
+  let query = Message.find({})
+  // 查询条件
+  query.where({
+    $or: [{
+      'userID': data.uid,
+      'friendID': data.fid,
+    }, {
+      'userID': data.fid,
+      'friendID': data.uid,
+    }]
+  })
+  // 按照最后通讯时间倒序
+  query.sort({ 'sendtime': -1 })
+  // 关联userID关联值
+  query.populate('userID')
+  // 跳过条数
+  query.skip(skipNum)
+  // 获取个数
+  query.limit(data.pageSize)
+  // 查询结果
+  query.exec().then(e => {
+    let result = e.map(i => {
+      return {
+        id: i._id,
+        sendtime: i.sendtime,
+        types: i.types,
+        message: i.message,
+        fromId: i.userID._id,
+        imgurl: i.userID.imgurl
+      }
+    })
+    res.send({ status: 200, result})
+  }).catch(err=>{
+    res.send({ status: 500 })
+  })
+}

@@ -14,7 +14,7 @@ exports.mkdir = function (pathname, callback) {
       let _stat = fs.statSync(path.join(__dirname, pre, floder))
       let hasMkdir = _stat && _stat.isDirectory()
       if (hasMkdir) {
-        callback && callback(`文件${floder}已经存在，不能重复创建，请重新创建`)
+        callback && callback(`文件${floder}已经存在，不能重复创建`)
       }
     } catch (error) {
       // 抛出异常，文件不存在则创建文件

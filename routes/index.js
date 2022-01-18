@@ -6,6 +6,7 @@ const searchUser = require('../server/searchFriend')
 const userDetail = require('../server/userDetail')
 const friend = require('../server/friend')
 const index = require('../server/index')
+const chat = require('../server/chat')
 
 // console.log(findUser)
 module.exports = function (app) {
@@ -394,11 +395,11 @@ module.exports = function (app) {
 * @apiSampleRequest http://localhost:3000/index/getGroupList
 * @apiVersion 1.0.0
 */
-app.post('/index/getGroupList', (req, res) => {
-	index.getGroupList(req, res)
-})
+	app.post('/index/getGroupList', (req, res) => {
+		index.getGroupList(req, res)
+	})
 
-		/**
+	/**
 * @api {post}	/group/updateGroupReadMsd 更新已读群消息状态
 * @apiDescription 更新群的消息状态，将未读消息状态改为已读消息
 * @apiName updateGroupReadMsd
@@ -413,7 +414,28 @@ app.post('/index/getGroupList', (req, res) => {
 * @apiSampleRequest http://localhost:3000/group/updateGroupReadMsd
 * @apiVersion 1.0.0
 */
-app.post('/group/updateGroupReadMsd', (req, res) => {
-	group.updateGroupReadMsd(req, res)
+	app.post('/group/updateGroupReadMsd', (req, res) => {
+		group.updateGroupReadMsd(req, res)
+	})
+
+		/**
+* @api {post}	/chat/getMsg 分页获取聊天信息
+* @apiDescription 分页获取与好友的聊天信息
+* @apiName getMsg
+* @apiGroup Chat
+* @apiParam {string} uid  用户id
+* @apiParam {string} fid  好友id
+* @apiParam {string} page  页码
+* @apiParam {string} pageSize 信息个数
+* @apiSuccess {string} status 状态码
+* @apiSuccessExample {json} Success-Response:
+*{
+*    "status": 200
+*}
+* @apiSampleRequest http://localhost:3000/chat/getMsg
+* @apiVersion 1.0.0
+*/
+app.post('/chat/getMsg', (req, res) => {
+	chat.getMsg(req, res)
 })
 }
