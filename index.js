@@ -2,6 +2,20 @@ const express = require('express')
 const app = express()
 const port = 3000
 
+// socket.io
+const http =require('http').createServer(app).listen(8090)
+const io = require('socket.io')(http,{ cors: true });
+
+io.on('connection', (socket) => {
+	console.log("连接成功")
+})
+
+
+
+// http.listen(8090, function(){
+// 	console.log('listening on *:8090');
+// });
+
 // 设置跨域访问
 // app.all("*", function (req, res, next) {
 // 	//设置允许跨域的域名，*代表允许任意域名跨域
@@ -16,25 +30,25 @@ const port = 3000
 // 		next();
 // })
 
-app.all('*', function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
-  res.header("Access-Control-Allow-Headers", "*");
-  // res.header("Content-Type", "application/json;charset=utf-8");
+app.all('*', function (req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "*");
+	// res.header("Content-Type", "application/json;charset=utf-8");
 	res.header("Access-Control-Max-Age", "86400");
-  if (req.method.toLowerCase() == 'options')
-	  res.send({ status: 200 });  //让options尝试请求快速结束
+	if (req.method.toLowerCase() == 'options')
+		res.send({ status: 200 });  //让options尝试请求快速结束
 	else
 		next();
 });
 
-app.use(express.json({limit: '50mb'}))
+app.use(express.json({ limit: '50mb' }))
 app.use(express.urlencoded({ limit: '50mb', extended: false }))
 require('./routes/index')(app)
 require('./routes/files')(app)
 // apidoc存放的位置
-app.use('/public',express.static('public'))
+app.use('/public', express.static('public'))
 // 上传文件存放的位置
-app.use('/upload',express.static('upload'))
+app.use('/upload', express.static('upload'))
 
 app.get('/', (req, res) => {
 	res.send('Hello World!')

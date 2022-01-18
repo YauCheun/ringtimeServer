@@ -164,13 +164,13 @@ exports.getUserInfo = function (id, res) {
 exports.updateUserInfo = function (data, res) {
   let updateStr = {}
   // 存在密码项
-  console.log(data)
+  // console.log(data)
   if (data.type === 'psw') {
     User.find({ '_id': data.id }, function (err, result) {
       if (err) {
         res.send({ status: 500 })
       } else {
-        console.log(result)
+        // console.log(result)
         if (result == '') {
           res.send({ status: 400 })
         }
@@ -391,7 +391,7 @@ exports.getUserList = function (data, res) {
   // 查询结果
   query.exec().then(async e => {
     let result = []
-    console.log(e)
+    // console.log(e)
     for (let i = 0; i < e.length; i++) {
       let oneMsg = await this.getLastOneMsg({ uid: data.uid, fid: e[i].friendID._id })
       let msgCount = await this.getUnReadCount({ uid: data.uid, fid: e[i].friendID._id })
