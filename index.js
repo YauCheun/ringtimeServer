@@ -6,10 +6,7 @@ const port = 3000
 const http =require('http').createServer(app).listen(8090)
 const io = require('socket.io')(http,{ cors: true });
 
-io.on('connection', (socket) => {
-	console.log("连接成功")
-})
-
+require('./dao/socket')(io)
 
 
 // http.listen(8090, function(){
