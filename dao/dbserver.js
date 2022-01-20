@@ -308,6 +308,23 @@ exports.insertMsg = function (uid, fid, msg, types, res) {
     }
   })
 }
+// 添加一对一消息
+exports.wsInsertMsg = function (uid, fid, msg, types) {
+  let data = {
+    userID: uid,               // 用户ID
+    friendID: fid,             // 好友ID
+    message: msg,              // 内容
+    types: types,              // 内容类型（0：文字 1：图片连接 2：音频连接）
+    sendtime: new Date(),     // 发送时间
+    state: 1                 // 状态（0：已读 1：未读）
+  }
+  let message = new Message(data)
+  message.save(function (err, result) {
+    if (err) {
+      console.log(err)
+    } 
+  })
+}
 
 
 // 好友申请
